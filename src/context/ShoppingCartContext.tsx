@@ -1,10 +1,14 @@
 import {createContext ,useContext, useState} from 'react';
 
 type ShoppingCartContext = {
+    openCart: () => void
+    closeCart: ()=> void
     getItemQuantity: (id: number) => number
     increaseCartQuantity: (id: number) => void
     decreaseCartQuantity: (id: number) => void
     removeFromCart: (id: number) => void
+    cartQuantity: number
+    cartItems: CartItem[]
 }
 
 type CartItem = {
@@ -25,6 +29,15 @@ export function useShoppingCart(){
 export function ShoppingCartProvider({children}: ShoppingCartProviderProps){
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const cartQuantity = cartItems.reduce(
+    (quantity, item) => item.quantity + quantity,
+    0
+  )
+
+    const openCart = () => setIsOpen(true);
+    const closeCart = () => setIsOpen(false);
 
     function getItemQuantity(id: number) {
         //CASO O ITEM SEJA ENCONTRADO O '?' PEGA O QUANTITY DELE SE NÃO RETORNA 0
@@ -64,12 +77,23 @@ export function ShoppingCartProvider({children}: ShoppingCartProviderProps){
         })
     }
 
+    function removeFromCart(id: number){
+        setCartItems(prev => {
+           return prev.filter((item) => item.id !== id)
+        })
+    }
+
     return (
         <ShoppingCartContext.Provider 
             value={{
                 getItemQuantity,
                 increaseCartQuantity,
-                decreaseCartQuantity
+                decreaseCartQuantity,
+                removeFromCart,
+                openCart,
+                closeCart,
+                cartItems,
+                cartQuantity
                 }}>
             {children}
         </ShoppingCartContext.Provider>

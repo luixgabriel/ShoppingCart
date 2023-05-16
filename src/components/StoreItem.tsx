@@ -1,5 +1,6 @@
 import { Card, Button } from "react-bootstrap";
 import { formatCurrency } from "../utilities/formatCurrency";
+import { useShoppingCart } from "../context/ShoppingCartContext";
 
 type StoreItemProps = {
     id: number,
@@ -9,8 +10,14 @@ type StoreItemProps = {
 }
 
 const StoreItem = ({id, name, price, imgUrl}: StoreItemProps) => {
+  //useShoppingCart está sendo usado como meu contexto
+    const {
+      getItemQuantity,
+      increaseCartQuantity,
+      decreaseCartQuantity,
+      removeFromCart} = useShoppingCart();
 
-    const quantity = 0;
+    const quantity = getItemQuantity(id);
 
   return (
     <Card className='h-100'>
@@ -23,7 +30,7 @@ const StoreItem = ({id, name, price, imgUrl}: StoreItemProps) => {
         </Card.Body>
         <div className="mt-auto">
             {quantity == 0 ? (
-                <Button className='w-100'>+ Add to cart</Button>
+                <Button className='w-100' onClick={()=> increaseCartQuantity(id)}>+ Add to cart</Button>
             ) : <div
             className="d-flex align-items-center flex-column"
             style={{ gap: ".5rem" }}
@@ -32,15 +39,16 @@ const StoreItem = ({id, name, price, imgUrl}: StoreItemProps) => {
               className="d-flex align-items-center justify-content-center"
               style={{ gap: ".5rem" }}
             >
-              <Button>-</Button>
+              <Button onClick={()=> decreaseCartQuantity(id)}>-</Button>
               <div>
-                <span className="fs-3">{quantity}</span> in cart
+                <span className="fs-3">{getItemQuantity(id)}</span> in cart
               </div>
-              <Button>+</Button>
+              <Button onClick={()=> increaseCartQuantity(id)}>+</Button>
             </div>
             <Button
               variant="danger"
               size="sm"
+              onClick={()=> removeFromCart(id)}
             >
               Remove
             </Button>
