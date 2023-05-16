@@ -1,4 +1,5 @@
 import {createContext ,useContext, useState} from 'react';
+import ShoppingCart from '../components/ShoppingCart';
 
 type ShoppingCartContext = {
     openCart: () => void
@@ -34,8 +35,8 @@ export function ShoppingCartProvider({children}: ShoppingCartProviderProps){
     const cartQuantity = cartItems.reduce(
     (quantity, item) => item.quantity + quantity,
     0
-  )
-
+    );
+   
     const openCart = () => setIsOpen(true);
     const closeCart = () => setIsOpen(false);
 
@@ -96,6 +97,7 @@ export function ShoppingCartProvider({children}: ShoppingCartProviderProps){
                 cartQuantity
                 }}>
             {children}
+            <ShoppingCart isOpen={isOpen}/>
         </ShoppingCartContext.Provider>
         )
 }
