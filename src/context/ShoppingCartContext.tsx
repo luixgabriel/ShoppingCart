@@ -1,0 +1,79 @@
+import {createContext ,useContext, useState} from 'react';
+
+type ShoppingCartContext = {
+    getItemQuantity: (id: number) => number
+    increaseCartQuantity: (id: number) => void
+    decreaseCartQuantity: (id: number) => void
+    removeFromCart: (id: number) => void
+}
+
+type CartItem = {
+    id: number,
+    quantity: number
+}
+
+type ShoppingCartProviderProps = {
+    children: React.ReactNode
+}
+
+const ShoppingCartContext = createContext({} as ShoppingCartContext);
+
+export function useShoppingCart(){
+    return useContext(ShoppingCartContext);
+}
+
+export function ShoppingCartProvider({children}: ShoppingCartProviderProps){
+
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+    function getItemQuantity(id: number) {
+        //CASO O ITEM SEJA ENCONTRADO O '?' PEGA O QUANTITY DELE SE NÃO RETORNA 0
+        return cartItems.find(item => item.id === id)?.quantity || 0
+    }
+
+    function increaseCartQuantity(id: number){
+        setCartItems(prev => {
+            //SE ISSO ME RETORNAR NULL EU ADICIONO NO CART
+            if(prev.find(item => item.id === id) == null){
+                return [...prev, {id, quantity: 1}]
+            }else{
+                return prev.map((item) => {
+                    if(item.id === id){
+                        return {...item, quantity: item.quantity + 1}
+                    }else {
+                        return item;
+                    }
+                })
+            }
+        })
+    }
+
+    function decreaseCartQuantity(id: number){
+        setCartItems(prev => {
+            if(prev.find(item => item.id === id)?.quantity == 1){
+                return prev.filter((item) => item.id !== id)
+            }else{
+                return prev.map((item) => {
+                    if(item.id === id){
+                        return {...item, quantity: item.quantity - 1}
+                    }else {
+                        return item;
+                    }
+                })
+            }
+        })
+    }
+
+    return (
+        <ShoppingCartContext.Provider 
+            value={{
+                getItemQuantity,
+                increaseCartQuantity,
+                decreaseCartQuantity
+                }}>
+            {children}
+        </ShoppingCartContext.Provider>
+        )
+}
+    
+   
